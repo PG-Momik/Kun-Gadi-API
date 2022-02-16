@@ -1,4 +1,8 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Method: POST, READ, PUT, DELETE');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
 require_once 'Model/Database.php';
 require_once 'Model/User.php';
@@ -6,6 +10,11 @@ require_once 'Model/Route.php';
 require_once 'Model/Coordinate.php';
 require_once 'Model/NodeContribution.php';
 require_once 'Model/RouteContribution.php';
+
+$url_components = explode("/", $_SERVER['REQUEST_URI']);
+$method = $_SERVER['REQUEST_METHOD'];
+$op = $_GET['op'];
+$en = $_GET['en'];
 
 $database = new Database();
 $db  = $database->connect();
@@ -19,17 +28,34 @@ $r_contribution = new RouteContribution($db);
 
 switch ($en) {
     case 'user':
-        switch($operation){
-            case "C":
+        switch ($op) {
+            case "registerUser":
                 break;
-            case "R1";
+        
+            case "loginUser":
                 break;
-            case "R":
+        
+            case "getAllUsers":
+                $user->read_AllUser();
                 break;
-            case "U":
+            case "getXUsers":
                 break;
-            case "D":
+        
+            case "getById":
                 break;
+        
+            case "updateUser":
+                break;
+        
+            case "promoteUser":
+                break;
+        
+            case "deleteUser":
+                break;
+        
+            case "getIdFromPhone";
+                break;
+        
             default:
                 break;
         }
