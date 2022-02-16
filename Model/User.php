@@ -53,3 +53,21 @@ class User
         }
         echo json_encode($response);
     }
+
+    function register()
+    {
+        if ($this->registration_validation()) {
+            if ($this->create_user()) {
+                $response = array(
+                    "code" => 200,
+                    "message" => "Registered"
+                );
+            }
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "Registration Failed"
+            );
+        }
+        echo json_encode($response);
+    }
