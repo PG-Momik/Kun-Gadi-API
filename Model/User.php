@@ -135,3 +135,29 @@ class User
         }
         echo json_encode($response);
     }
+
+    function read_SingleUser($id)
+    {
+        if ($this->user_exists($id)) {
+            $result  = $this->fetch_user_by_id($id);
+            $user_arr = array(
+                'id' => $result['id'],
+                'name' => $result['name'],
+                'phone' => $result['phone'],
+                'email' => $result['email'],
+                'password' => $result['password'],
+                'created' => $result['created'],
+                'role' => $result['role']
+            );
+            $response = array(
+                "code" => 200,
+                "message" => $user_arr
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "User does not exist"
+            );
+        }
+        echo json_encode($response);
+    }
