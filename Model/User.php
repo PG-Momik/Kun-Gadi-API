@@ -99,3 +99,39 @@ class User
         }
         return false;
     }
+
+    function update_user()
+    {
+        if ($this->user_exists($this->id)) {
+            $query = 'UPDATE users u 
+            SET 
+            u.name = :name,
+            u.phone = :phone,
+            u.email = :email, 
+            u.role_id = :role_id
+            WHERE u.id = :id';
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $this->id);
+            $stmt->bindParam(':name', $this->name);
+            $stmt->bindParam(':phone', $this->phone);
+            $stmt->bindParam(':email', $this->email);
+            $stmt->bindParam(':role_id', $this->role_id);
+            if ($stmt->execute()) {
+                $response = array(
+                    "code" => 200,
+                    "message" => "User Updated."
+                );
+            } else {
+                $response = array(
+                    "code" => 500,
+                    "message" => "User not Updated."
+                );
+            }
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "User does not exist."
+            );
+        }
+        echo json_encode($response);
+    }
