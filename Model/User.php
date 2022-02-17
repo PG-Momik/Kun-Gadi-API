@@ -71,3 +71,31 @@ class User
         }
         echo json_encode($response);
     }
+
+    function create_user()
+    {
+        $name = $this->name;
+        $phone = $this->phone;
+        $email = $this->email;
+        $password = $this->password;
+        $password   = password_hash($password, PASSWORD_DEFAULT);
+        $query = 'INSERT INTO users  
+        SET
+        name = :name,
+        phone = :phone,
+        email = :email,
+        password=:password';
+        $stmt = $this->conn->prepare($query);
+        $this->name = htmlspecialchars(strip_tags($name));
+        $this->phone = htmlspecialchars(strip_tags($phone));
+        $this->email = htmlspecialchars(strip_tags($email));
+        $this->password = htmlspecialchars(strip_tags($password));
+        $stmt->bindParam(':name', $this->name);
+        $stmt->bindParam(':phone', $this->phone);
+        $stmt->bindParam(':email', $this->email);
+        $stmt->bindParam(':password', $this->password);
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
