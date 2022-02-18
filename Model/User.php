@@ -161,3 +161,35 @@ class User
         }
         echo json_encode($response);
     }
+
+    function read_AllUser()
+    {
+        $result = $this->readAllUsers();
+        $num = $result->rowCount();
+        if ($num) {
+            $user_arr = array();
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $user_item = array(
+                    'id' => $id,
+                    'name' => $name,
+                    'phone' => $phone,
+                    'email' => $email,
+                    'password' => $password,
+                    'role_id' => $rid,
+                    'role' => $role
+                );
+                array_push($user_arr, $user_item);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $user_arr
+            );
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data"
+            );
+        }
+        echo json_encode($response);
+    }
