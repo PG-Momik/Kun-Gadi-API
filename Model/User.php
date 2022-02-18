@@ -193,3 +193,18 @@ class User
         }
         echo json_encode($response);
     }
+
+    function deleteUser($id)
+    {
+        if ($this->user_exists($id)) {
+            $query = 'DELETE  FROM ' . $this->table . ' WHERE id = :id';
+            $stmt = $this->conn->prepare($query);
+            $this->id = htmlspecialchars(strip_tags($id));
+            $stmt->bindParam(':id', $this->id);
+            if ($stmt->execute()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
