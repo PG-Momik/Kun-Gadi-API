@@ -208,3 +208,47 @@ class User
             }
         }
     }
+
+    function read_XUser($page)
+    {
+        $limit = 10;
+        $start = ($page - 1) * $limit;
+        $query = 'SELECT 
+        u.id, 
+        u.name, 
+        u.phone, 
+        u.email, 
+        u.password, 
+        u.role_id as rid, 
+        r.name as role 
+        FROM users u 
+        JOIN roles r on u.role_id =  r.id
+        ORDER BY u.created ASC LIMIT ' . $start . ', ' . $limit;
+        $stmt = $this->conn->prepare($query);
+        if ($stmt->execute()) {
+            $user_arr = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $user_item = array(
+                    'id' => $id,
+                    'name' => $name,
+                    'phone' => $phone,
+                    'email' => $email,
+                    'password' => $password,
+                    'role_id' => $rid,
+                    'role' => $role
+                );
+                array_push($user_arr, $user_item);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $user_arr
+            );
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data"
+            );
+        }
+        echo json_encode($response);
+    }
