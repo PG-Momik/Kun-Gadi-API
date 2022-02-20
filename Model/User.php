@@ -252,3 +252,37 @@ class User
         }
         echo json_encode($response);
     }
+
+    function registration_validation()
+    {
+        $errors = [];
+        if (empty($this->name)) {
+            $error[] = "Name is required.";
+        }
+        if (!preg_match("/^[a-zA-Z-' ]*$/", $this->name)) {
+            $error[] = "Invalid Name.";
+        }
+        if (empty($this->phone)) {
+            $error[] = "Phone is required.";
+        }
+        if ($this->phone_exists($this->phone)) {
+            $errors[] = "Sorry that Username is already is taken";
+        }
+        if (empty($this->email)) {
+            $error[] = "Email is required.";
+        }
+        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            $error[] = "Invalid email format.";
+        }
+        if (strlen($this->password) < 8) {
+            $errors[] = "Your Password cannot be less then 8 characters";
+        }
+        if ($this->password != $this->con_password) {
+            $errors[] = "The password was not confirmed correctly";
+        }
+        if (!empty($errors)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
