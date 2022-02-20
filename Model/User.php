@@ -376,3 +376,60 @@ class User
         }
         return false;
     }
+
+    function promote_User($id)
+    {
+        $query = "SELECT role_id FROM users WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        if ($this->user_exists($id)) {
+            $stmt->execute();
+            $result = $stmt;
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                if ($role_id == "1") {
+                    $response = array(
+                        "code" => 200,
+                        "message" => "User cannot be promoted further",
+                    );
+                } else {
+                    $new_role = $role_id - 1;
+                    $query = "UPDATE users set role_id=:new WHERE id=:id";
+                    $stmt = $this->conn->prepare($query);
+                    $stmt->bindParam(':id', $this->id);
+                    $stmt->bindParam(':new', $new_role);
+                    if ($stmt->execute()) {
+                        $response = array(
+                            "code" => 200,
+                            "message" => "User promoted",
+                        );
+                    }
+                }
+            }
+            echo json_encode($response);
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "User does not exist",
+            );
+            echo json_encode($response);
+        }
+    }
+
+    function getIdFromPhone($phone)
+    {
+        $query = "SELECT id from users where phone =:phone";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':phone', $phone);
+        if ($stmt->execute()) {
+            if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $response = array(
+                    "code" => 200,
+                    "message" => $row['id']
+                );
+                echo json_encode($response);
+            }
+        }
+    }
+
+}
