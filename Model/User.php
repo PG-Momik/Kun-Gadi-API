@@ -357,3 +357,22 @@ class User
         }
         return false;
     }
+
+    function readAllUsers()
+    {
+        $query = 'SELECT u.id, 
+        u.name, 
+        u.phone, 
+        u.email, 
+        u.password, 
+        r.name as role from users u 
+        Join roles r on u.role_id = r.id 
+        order by u.id DESC';
+
+        $stmt = $this->conn->prepare($query);
+
+        if ($stmt->execute()) {
+            return $stmt;
+        }
+        return false;
+    }
