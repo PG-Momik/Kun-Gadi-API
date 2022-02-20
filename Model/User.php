@@ -286,3 +286,74 @@ class User
             return true;
         }
     }
+
+    function user_exists($id)
+    {
+        $query = 'SELECT id 
+        FROM ' . $this->table . '  
+        WHERE 
+        id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return true;
+        }
+        return false;
+    }
+
+    function login_validation()
+    {
+        $errors = [];
+        if (empty($this->phone)) {
+            $error[] = "Phone is required.";
+        }
+        if (strlen($this->password) < 8) {
+            $errors[] = "Your Password cannot be less then 8 characters";
+        }
+        if (!empty($errors)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function fetch_user($id)
+    {
+        $query = 'SELECT name, password
+        FROM ' . $this->table . '  
+        WHERE 
+        id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return $row;
+        }
+        return false;
+    }
+
+    function fetch_user_by_id($id)
+    {
+        $query = 'SELECT u.id, 
+        u.name, 
+        u.phone, 
+        u.email,
+        u.created,
+        u.password, 
+        r.id as rid, 
+        r.name as role from users u 
+        Join roles r on u.role_id = r.id   
+        WHERE 
+        u.id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return $row;
+        }
+        return false;
+    }
