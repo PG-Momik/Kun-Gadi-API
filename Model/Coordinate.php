@@ -96,3 +96,32 @@ class Coordinate{
             echo json_encode($response);
         }
     }
+
+    function read_AllNode(){
+        $result = $this->readAllCoordinates();
+        $num = $result->rowCount();
+        if ($num) {
+            $coord_array = array();
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $coord_item = array(
+                    'id' => $id,
+                    'name' => $name,
+                    'longitude' => $longitude,
+                    'latitude' => $latitude
+                );
+                array_push($coord_array, $coord_item);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $coord_array
+            );
+            echo json_encode($response);
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data"
+            );
+            echo json_encode($response);
+        }
+    }
