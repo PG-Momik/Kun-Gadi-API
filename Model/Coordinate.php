@@ -39,3 +39,26 @@ class Coordinate{
             echo json_encode($response);
         } 
     }
+
+    function read_SingleNodeById($id){
+        if ($this->coordinate_exists($id)) {
+            $result  = $this->fetch_coordinate_by_id($id);
+            $coord_array = array(
+                'id' => $result['id'],
+                'name' => $result['name'],
+                'longitude' => $result['longitude'],
+                'latitude' => $result['latitude']
+            );
+            $response = array(
+                "code" => 200,
+                "message" => $coord_array
+            );
+            echo json_encode($response);
+        }else{
+            $response = array(
+                "code" => 500,
+                "message" => "No node with id: ".$id
+            );
+            echo json_encode($response);
+        }
+    }
