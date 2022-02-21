@@ -62,3 +62,37 @@ class Coordinate{
             echo json_encode($response);
         }
     }
+
+    function read_SingleNodeByName($name){
+        $name = htmlspecialchars(strip_tags($name));
+        $query = "SELECT c.id, 
+        c.name, 
+        c.longitude, 
+        c.longitude, 
+        c.latitude 
+        FROM nodes c 
+        WHERE 
+        c.name LIKE :name";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":name", $name);
+        if($stmt->execute()){
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $coord_array = array(
+                'id' => $result['id'],
+                'name' => $result['name'],
+                'longitude' => $result['longitude'],
+                'latitude' => $result['latitude']
+            );
+            $response = array(
+                "code" => 200,
+                "message" => $coord_array
+            );
+            echo json_encode($response);
+        }else{
+            $response = array(
+                "code" => 500,
+                "message" => "No node with name: ".$name
+            );
+            echo json_encode($response);
+        }
+    }
