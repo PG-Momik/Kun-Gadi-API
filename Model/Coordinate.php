@@ -192,3 +192,43 @@ class Coordinate{
         }
 
     }
+
+    function coordinate_exists($id, $activity = null)
+    {
+        $query = 'SELECT id 
+        FROM ' . $this->table . '  
+        WHERE 
+        id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            if ($activity == "login") {
+                return $row['id'];
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function fetch_coordinate_by_id($id)
+    {
+        $query = 'SELECT c.id, 
+        c.name, 
+        c.longitude, 
+        c.longitude, 
+        c.latitude 
+        from nodes c 
+        WHERE 
+        c.id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return $row;
+        }
+        return false;
+    }
