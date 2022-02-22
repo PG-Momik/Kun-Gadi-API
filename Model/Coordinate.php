@@ -125,3 +125,48 @@ class Coordinate{
             echo json_encode($response);
         }
     }
+
+    function update_Node($type = '')
+    {
+        if ($this->coordinate_exists($this->id)) {
+                $query = 'UPDATE nodes c 
+                SET 
+                c.name = :name,
+                c.longitude = :longitude,
+                c.latitude = :latitude
+                WHERE c.id = :id';
+
+            $stmt = $this->conn->prepare($query);
+
+            $this->id = htmlspecialchars(strip_tags($this->id));
+            $stmt->bindParam(':id', $this->id);
+
+            $this->name = htmlspecialchars(strip_tags($this->name));
+            $stmt->bindParam(':name', $this->name);
+
+            $this->longitude = htmlspecialchars(strip_tags($this->longitude));
+            $stmt->bindParam(':longitude', $this->longitude);
+
+            $this->latitude = htmlspecialchars(strip_tags($this->latitude));
+            $stmt->bindParam(':latitude', $this->latitude);
+            if ($stmt->execute()) {
+                $response = array(
+                    "code" => 200,
+                    "message" => "Node updated."
+                );
+            }else {
+                $response = array(
+                    "code" => 400,
+                    "message" => "Node not updated."
+                );
+            }
+        }
+        else{
+            $response = array(
+                "code" => 400,
+                "message" => "Node does not exist."
+            );
+        }
+        echo json_encode($response);
+    }
+
