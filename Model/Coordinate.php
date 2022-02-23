@@ -277,3 +277,4 @@ class Coordinate{
         $stmt->execute();
         return $stmt;
     }
+}
