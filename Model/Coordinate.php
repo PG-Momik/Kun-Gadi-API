@@ -232,3 +232,10 @@ class Coordinate{
         }
         return false;
     }
+
+    public function readAllCoordinates(){
+        $query = 'SELECT * FROM '.$this->table.' ORDER BY id DESC' ;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
