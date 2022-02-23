@@ -268,3 +268,12 @@ class Coordinate{
             echo json_encode($response);
         }
     }
+
+    public function readXCoordinates($page){
+        $limit = 10;
+        $start = ($page - 1)*$limit;
+        $query = 'SELECT * FROM '.$this->table.' ORDER BY name ASC LIMIT '.$start.", ".$limit ;
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
