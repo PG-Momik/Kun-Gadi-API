@@ -239,3 +239,32 @@ class Coordinate{
         $stmt->execute();
         return $stmt;
     }
+
+    function read_XNode($page){
+        $result = $this->readXCoordinates($page);
+        $num = $result->rowCount();
+        if ($num) {
+            $coord_array = array();
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $coord_item = array(
+                    'id' => $id,
+                    'name' => $name,
+                    'longitude' => $longitude,
+                    'latitude' => $latitude
+                );
+                array_push($coord_array, $coord_item);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $coord_array
+            );
+            echo json_encode($response);
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data"
+            );
+            echo json_encode($response);
+        }
+    }
