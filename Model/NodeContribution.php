@@ -67,3 +67,40 @@ class NodeContribution
         }
         echo json_encode($response);
     }
+
+    function read_SingleContribution($id, $admin)
+    {
+        $query = "SELECT  cr.id, 
+        cr.coordinate_id, 
+        cr.user_id,
+        cr.longitude as n_lng, 
+        cr.latitude as n_lat,
+        cr.state_id, 
+        cr.created,
+        c.name as name,
+        c.longitude as o_lat,
+        c.latitude as o_lng
+        FROM contribute_nodes cr 
+        JOIN nodes c on cr.coordinate_id = c.id
+        WHERE cr.id =" . $id;
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+            if ($admin && $response["message"][0]['state_id'] == 3) {
+                $this->acknowledgeContribution($id);
+            }
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
