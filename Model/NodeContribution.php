@@ -45,3 +45,25 @@ class NodeContribution
             echo json_encode($response);
         }
     }
+
+    function read_AllContributions()
+    {
+        $query = "SELECT * FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
