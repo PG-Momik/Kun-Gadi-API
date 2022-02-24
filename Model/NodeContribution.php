@@ -104,3 +104,24 @@ class NodeContribution
         }
         echo json_encode($response);
     }
+    function read_UserContribution($user_id)
+    {
+        $query = "SELECT c.id, n.name as name, c.longitude as n_lat, c.latitude as n_lng, c.created, c.state_id, n.latitude as o_lat, n.longitude as o_lng FROM contribute_nodes c JOIN nodes n on c.coordinate_id = n.id";
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
