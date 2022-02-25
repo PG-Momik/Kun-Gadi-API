@@ -171,3 +171,11 @@ class NodeContribution
         }
         echo json_encode($response);
     }
+
+    function acknowledgeContribution($id)
+    {
+        $query = "UPDATE contribute_nodes SET state_id = 2 where id =:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+    }
