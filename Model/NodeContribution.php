@@ -179,3 +179,23 @@ class NodeContribution
         $stmt->bindParam(':id', $id);
         $stmt->execute();
     }
+
+    function delete_Contribution($id)
+    {
+        $query = 'DELETE  FROM ' . $this->table . ' WHERE id = :id';
+        $stmt = $this->conn->prepare($query);
+        $this->id = htmlspecialchars(strip_tags($id));
+        $stmt->bindParam(':id', $this->id);
+        if ($stmt->execute()) {
+            $response = array(
+                "code" => 200,
+                "message" => "Contribution deleted."
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "Contribution not deleted."
+            );
+        }
+        echo json_encode($response);
+    }
