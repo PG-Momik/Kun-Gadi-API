@@ -104,6 +104,7 @@ class NodeContribution
         }
         echo json_encode($response);
     }
+
     function read_UserContribution($user_id)
     {
         $query = "SELECT c.id, n.name as name, c.longitude as n_lat, c.latitude as n_lng, c.created, c.state_id, n.latitude as o_lat, n.longitude as o_lng FROM contribute_nodes c JOIN nodes n on c.coordinate_id = n.id";
@@ -121,6 +122,51 @@ class NodeContribution
             $response = array(
                 "code" => 400,
                 "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
+
+    function acceptContribution($id, $coordinate_id)
+    {
+        echo "eta";
+        $query = "UPDATE contribute_nodes SET state_id = 1 where id =:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        $query = "SELECT 
+            cn.longitude as cnlng, 
+            cn.latitude as cnlat, 
+            n.longitude as nlat, 
+            n.latitude as nlng,
+            n.name
+            FROM contribute_nodes cn
+            JOIN nodes n on n.id = cn.coordinate_id
+            WHERE 
+            cn.id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $coords = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $new_lon = ((float)$coords['cnlng'] + (float)$coords['nlng']) / 2;
+        $new_lat = ((float)$coords['cnlat'] + (float)$coords['nlat']) / 2;
+
+        $query = "UPDATE nodes SET longitude = :longitude, latitude = :latitude WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $coordinate_id);
+        $stmt->bindParam(':longitude', $new_lat);
+        $stmt->bindParam(':latitude', $new_lon);
+        if ($stmt->execute()) {
+            $response = array(
+                "code" => 200,
+                "message" => "Contribution Accepted."
+            );
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "Something went wrong."
             );
         }
         echo json_encode($response);
