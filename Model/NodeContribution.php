@@ -262,3 +262,5 @@ class NodeContribution
         echo $new_data['longitude'];
         echo $new_data['latitude'];
     }
+
+}
