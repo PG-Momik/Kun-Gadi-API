@@ -237,3 +237,28 @@ class NodeContribution
         }
         echo json_encode($response);
     }
+
+    public function makeChangesToNode($node_id)
+    {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = " . $this->id;
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $this->id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $query = 'SELECT 
+        id, name, longitude, latitude 
+        FROM nodes 
+        WHERE id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $node_id);
+        $stmt->execute();
+        $row2 = $stmt->fetch(PDO::FETCH_ASSOC);
+        $new_data = array();
+
+        $new_data['longitude'] = ((float)$row['longitude'] + (float)$row2['longitude']) / 2;
+        $new_data['latitude'] = ((float)$row['latitude'] + (float)$row2['latitude']) / 2;
+
+        echo $new_data['longitude'];
+        echo $new_data['latitude'];
+    }
