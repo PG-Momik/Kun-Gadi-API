@@ -199,3 +199,41 @@ class NodeContribution
         }
         echo json_encode($response);
     }
+
+    function read_XContributions($page)
+    {
+        $limit = 10;
+        $start = ($page - 1) * $limit;
+        $query = "SELECT cn.id, 
+            n.name as node, 
+            u.name as user,
+            cn.longitude, 
+            cn.latitude, 
+            s.name as state,
+            cn.coordinate_id as nid, 
+            cn.user_id as uid,
+            cn.state_id as sid, 
+            cn.created
+            FROM contribute_nodes cn
+            JOIN nodes n on cn.coordinate_id = n.id
+            JOIN users u on cn.user_id = u.id
+            JOIN states s on cn.state_id = s.id
+            ORDER BY cn.created DESC LIMIT " . $start . ", " . $limit;
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
