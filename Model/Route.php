@@ -108,3 +108,11 @@ class Route
         }
         echo json_encode($response);
     }
+
+    public function read_RouteByNo($num){}
+
+    public function read_RouteByStart($start){}
+
+    public function read_RouteByEnd($end){}
+    
+    public function read_routeToNode($node){}
