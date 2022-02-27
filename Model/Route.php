@@ -45,3 +45,34 @@ class Route
             echo json_encode($response);
         }
     }
+
+    public function read_RouteAll()
+    {
+        $query = 'SELECT * FROM routes';
+        $stmt = $this->conn->prepare($query);
+        if ($stmt->execute()) {
+            $route_array = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $route_item = array(
+                    'id' => $id,
+                    'path' => $path,
+                    'start' => $start,
+                    'end' => $end,
+                    'route_no' => $route_no,
+                );
+                array_push($route_array, $route_item);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $route_array,
+            );
+            echo json_encode($response);
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data",
+            );
+            echo json_encode($response);
+        }
+    }
