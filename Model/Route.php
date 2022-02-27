@@ -76,3 +76,35 @@ class Route
             echo json_encode($response);
         }
     }
+
+    public function read_RouteById($id = null)
+    {
+        $query = "SELECT r.id, r.path, r.route_no, n1.name as start, n2.name as end
+        FROM routes r
+        JOIN nodes n1 on r.start = n1.id
+        JOIN nodes n2 on r.end = n2.id
+        WHERE r.id = :id";
+        $stmt = $this->conn->prepare($query);
+        $this->id = htmlspecialchars(strip_tags($id));
+        $stmt->bindParam(':id', $id);
+        if ($stmt->execute()) {
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $route_array = array(
+                'id' => $result['id'],
+                'path' => $result['path'],
+                'start' => $result['start'],
+                'end' => $result['end'],
+                'route_no' => $result['route_no'],
+            );
+            $response = array(
+                "code" => 200,
+                "message" => $route_array,
+            );
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data found.",
+            );
+        }
+        echo json_encode($response);
+    }
