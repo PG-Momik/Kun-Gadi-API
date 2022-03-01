@@ -109,10 +109,49 @@ class Route
         echo json_encode($response);
     }
 
-    public function read_RouteByNo($num){}
+    public function read_RouteByNo($num)
+    {
+        $query = "SELECT r.id, r.path, r.route_no,
+        n1.name as start,
+        n2.name as end
+        FROM routes r
+        JOIN nodes n1 on r.start = n1.id
+        JOIN nodes n2 on r.end = n2.id
+        WHERE route_no =  :num";
+        $stmt = $this->conn->prepare($query);
+        $num = htmlspecialchars(strip_tags($num));
+        $stmt->bindParam(':num', $num);
+        $stmt->execute();
+        $result = $stmt;
+        $num = $result->rowCount();
+        if ($num) {
+            $route_array = array();
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $route_item = array(
+                    'id' => $id,
+                    'route_no' => $route_no,
+                    'path' => $path,
+                    'start' => $start,
+                    'end' => $end,
+                );
+                array_push($route_array, $route_item);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $route_array,
+            );
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data",
+            );
+        }
+        echo json_encode($response);
+    }
 
     public function read_RouteByStart($start){}
 
     public function read_RouteByEnd($end){}
-    
+
     public function read_routeToNode($node){}
