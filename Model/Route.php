@@ -425,3 +425,16 @@ class Route
         }
         return false;
     }
+
+    public function generate_query($nodes)
+    {
+        $sql_p1 = "SELECT id, name, longitude, latitude FROM nodes where ";
+        $sql_p2 = null;
+        foreach ($nodes as $node) {
+            $sql_p2 = $sql_p2 . "name LIKE '" . $node . "' || ";
+        }
+
+        $sql_p2 = substr($sql_p2, 0, -3);
+        return $sql_p1 . $sql_p2;
+    }
+
