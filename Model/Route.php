@@ -309,3 +309,51 @@ class Route
             );
         }
     }
+
+    public function update_route($id)
+    {
+        if ($this->route_exists($id)) {
+            $query = 'UPDATE routes 
+            SET 
+            path = :path,
+            start = :start,
+            end = :end,
+            route_no = :route_no
+            WHERE id = :id';
+
+            $stmt = $this->conn->prepare($query);
+
+            $this->id = htmlspecialchars(strip_tags($this->id));
+            $stmt->bindParam(':id', $this->id);
+
+            $this->path = htmlspecialchars(strip_tags($this->path));
+            $stmt->bindParam(':path', $this->path);
+
+            $this->start = htmlspecialchars(strip_tags($this->start));
+            $stmt->bindParam(':start', $this->start);
+
+            $this->end = htmlspecialchars(strip_tags($this->end));
+            $stmt->bindParam(':end', $this->end);
+
+            $this->route_no = htmlspecialchars(strip_tags($this->route_no));
+            $stmt->bindParam(':route_no', $this->route_no);
+
+            if ($stmt->execute()) {
+                $response = array(
+                    "code" => 200,
+                    "message" => "Route updated."
+                );
+            } else {
+                $response = array(
+                    "code" => 400,
+                    "message" => "Route not updated."
+                );
+            }
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "Route does not exist."
+            );
+        }
+        echo json_encode($response);
+    }
