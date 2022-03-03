@@ -384,3 +384,44 @@ class Route
         }
         echo json_encode($response);
     }
+
+    public function readAllRoutes()
+    {
+        $query = 'SELECT * FROM ' . $this->table . ' ORDER BY id DESC';
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public function route_exists($id)
+    {
+        $query = 'SELECT id
+        FROM ' . $this->table . '
+        WHERE
+        id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function fetch_route_by_id($id)
+    {
+        $query = 'SELECT path, start , end
+        from routes
+        WHERE
+        id = :id';
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return $row;
+        }
+        return false;
+    }
