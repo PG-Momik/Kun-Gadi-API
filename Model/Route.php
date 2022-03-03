@@ -464,3 +464,33 @@ class Route
         }
         return $nodes;
     }
+
+    public function read_nodesByPath($path)
+    {
+        $data = array();
+        $nodes = explode(", ", $path);
+        $nodes = array_values(array_unique($nodes));
+        $sql_p1 = "SELECT name, longitude, latitude FROM nodes where ";
+        $sql_p2 = null;
+        foreach ($nodes as $node) {
+            $sql_p2 = $sql_p2 . "name LIKE '" . $node . "' || ";
+        }
+        $sql_p2 = substr($sql_p2, 0, -3);
+        $fullquery = $sql_p1 . $sql_p2;
+        $stmt = $this->conn->prepare($fullquery);
+        $fullquery = $sql_p1 . $sql_p2;
+        $stmt = $this->conn->prepare($fullquery);
+        $stmt->execute();
+        $result = $stmt;
+        $num = $result->rowCount();
+        for ($i = 0; $i < $num; $i++) {
+            $row = $result->fetch(PDO::FETCH_ASSOC);
+            array_push($data, $row);
+        }
+        echo json_encode(
+            array(
+                "code" => 200,
+                "message" => $data
+            )
+        );
+    }
