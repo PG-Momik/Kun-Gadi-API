@@ -357,3 +357,30 @@ class Route
         }
         echo json_encode($response);
     }
+
+    public function delete_Route($id)
+    {
+        if ($this->route_exists($id)) {
+            $query = 'DELETE  FROM ' . $this->table . ' WHERE id = :id';
+            $stmt = $this->conn->prepare($query);
+            $this->id = htmlspecialchars(strip_tags($id));
+            $stmt->bindParam(':id', $id);
+            if ($stmt->execute()) {
+                $response = array(
+                    "code" => 200,
+                    "message" => "Route deleted."
+                );
+            } else {
+                $response = array(
+                    "code" => 400,
+                    "message" => "Route not deleted."
+                );
+            }
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "Route does not exist."
+            );
+        }
+        echo json_encode($response);
+    }
