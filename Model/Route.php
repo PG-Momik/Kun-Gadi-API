@@ -438,3 +438,29 @@ class Route
         return $sql_p1 . $sql_p2;
     }
 
+    public function generate_divided_path($path, $node)
+    {
+        $node = str_replace("%", "", $node);
+        $i = 0;
+        $divided_path = array();
+        for ($i = 0; $i < sizeof($path); $i++) {
+            if ($path[$i]['name'] == $node) {
+                echo $i . "<br>";
+            }
+        }
+    }
+
+    public function path_string_to_array($paths)
+    {
+        $combination = null;
+        foreach ($paths as $path) {
+            $combination = $path . " ," . $combination;
+        }
+        $combination = substr($combination, 0, -2);
+        $nodes = explode(",", $combination);
+        $nodes = array_values(array_unique($nodes));
+        for ($i = 0; $i < sizeof($nodes); $i++) {
+            $nodes[$i] = str_replace(" ", "", $nodes[$i]);
+        }
+        return $nodes;
+    }
