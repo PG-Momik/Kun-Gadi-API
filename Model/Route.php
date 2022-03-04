@@ -494,3 +494,41 @@ class Route
             )
         );
     }
+
+    public function read_XRoute($page)
+    {
+        $limit = 10;
+        $start = ($page - 1) * $limit;
+        $query = 'SELECT r.id, r.path, r.start as sid, r.end as eid, n.name as start, m.name as end
+        FROM routes r
+        JOIN nodes n ON r.start = n.id
+        JOIN nodes m ON r.end = m.id
+        ORDER BY id DESC LIMIT ' . $start . ', ' . $limit;
+        $stmt = $this->conn->prepare($query);
+        if ($stmt->execute()) {
+            $route_array = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $route_item = array(
+                    'id' => $id,
+                    'path' => $path,
+                    'sid' => $sid,
+                    'eid' => $eid,
+                    'start' => $start,
+                    'end' => $end,
+                );
+                array_push($route_array, $route_item);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $route_array,
+            );
+            echo json_encode($response);
+        } else {
+            $response = array(
+                "code" => 500,
+                "message" => "No data",
+            );
+            echo json_encode($response);
+        }
+    }
