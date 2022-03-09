@@ -532,3 +532,246 @@ class Route
             echo json_encode($response);
         }
     }
+
+    function getCoordinatesFromPath($path)
+    {
+        $this->getCoordinatesFromArrayOfId($this->getArrayOfIdFromPath($path));
+    }
+
+    function getArrayOfIdFromPath($path)
+    {
+        $arrayOfID = array();
+        $nodes = null;
+        $size = 0;
+        // // if(sizeof($path) == 1){
+        //     $nodes = explode(", ", $path[0]);
+        //     $size = sizeof($nodes);
+        //     $nodes = array_values(array_unique($nodes));
+        // }else{
+        $nodes = explode(", ", $path);
+        $size =  sizeof($nodes);
+        // }
+        for ($i = 0; $i < $size; $i++) {
+            $query =  "SELECT id FROM nodes WHERE name = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $nodes[$i]);
+            if ($stmt->execute()) {
+                $result = $stmt;
+                $row = $result->fetch(PDO::FETCH_ASSOC);
+                // extract($row);
+                array_push($arrayOfID, $row['id']);
+            } else {
+            }
+        }
+        return $arrayOfID;
+    }
+
+    function getCoordinatesFromArrayOfId($array_of_node_id)
+    {
+        $array_of_nodes = array();
+        for ($i = 0; $i < sizeof($array_of_node_id); $i++) {
+            $query =  "SELECT name, 
+            longitude as lat, 
+            latitude as lng 
+            FROM nodes 
+            WHERE id = :id Limit 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $array_of_node_id[$i]);
+            if ($stmt->execute()) {
+                $result = $stmt;
+                $row = $result->fetch(PDO::FETCH_ASSOC);
+                array_push($array_of_nodes, $row);
+            } else {
+                $response = array(
+                    "code" => "500",
+                    "message" => "Something went wrong."
+                );
+                return false;
+            }
+        }
+        $response = array(
+            "code" => 200,
+            "message" => $array_of_nodes
+        );
+        echo json_encode($response);
+    }
+
+    function getPathDirectly($from, $to)
+    {
+        $path_array = array();
+        $query = "SELECT r.path FROM routes r 
+        JOIN nodes n ON r.start = n.id
+        JOIN nodes m ON r.end = m.id 
+        WHERE n.name LIKE :frm AND m.name LIKE :too
+        LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $from  = "%" . $from . "%";
+        $to  = "%" . $to;
+        $stmt->bindParam(':frm', $from);
+        $stmt->bindParam(':too', $to);
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                array_push($path_array, $path);
+            }
+            return $path_array;
+        } else {
+            return false;
+        }
+    }
+
+    function getPathIndirectly($from, $to)
+    {
+        $path_array = array();
+        $query = "SELECT r.path FROM routes r 
+        WHERE r.path LIKE :frm AND r.path LIKE :too
+        LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $from  = "%" . $from . "%";
+        $to  = "%" . $to . "%";
+        $stmt->bindParam(':frm', $from);
+        $stmt->bindParam(':too', $to);
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                array_push($path_array, $path);
+            }
+            return $path_array;
+        } else {
+            return false;
+        }
+    }
+
+    function getPathAdvanceSearch($from, $to)
+    {
+        $arr1 = array();
+        $query1 = "SELECT path 
+        FROM routes 
+        WHERE path LIKE :frm 
+        AND path NOT LIKE :too";
+        $temp_from = "%" . $from . "%";
+        $temp_to = "%" . $to . "%";
+        $stmt1 = $this->conn->prepare($query1);
+        $stmt1->bindParam(':frm', $temp_from);
+        $stmt1->bindParam(':too', $temp_to);
+        if ($stmt1->execute()) {
+            while ($row = $stmt1->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                array_push($arr1, $path);
+            }
+        }
+
+        $arr2 = array();
+        $query2 = "SELECT path 
+        FROM routes 
+        WHERE path LIKE :too 
+        AND path NOT LIKE :frm";
+        $temp_from = "%" . $from . "%";
+        $temp_to = "%" . $to . "%";
+        $stmt2 = $this->conn->prepare($query2);
+        $stmt2->bindParam(':frm', $temp_from);
+        $stmt2->bindParam(':too', $temp_to);
+        if ($stmt2->execute()) {
+            while ($row = $stmt2->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                array_push($arr2, $path);
+            }
+        }
+
+        foreach ($arr1 as $rawPath1) {
+            $arrayzedPath1 = explode(", ", $rawPath1);
+            $temp_p1 = $arrayzedPath1;
+            $index_of_from = array_search($from, $arrayzedPath1);
+            $index_of_com_on_p1 = null;
+            foreach ($arr2 as $rawPath2) {
+                $arrayzedPath2 = explode(", ", $rawPath2);
+                $temp_p2 = $arrayzedPath2;
+                $index_of_to = array_search($to, $arrayzedPath2);
+                $index_of_com_on_p1 = null;
+                if (count(array_intersect($arrayzedPath1, $arrayzedPath2)) === 0) {
+                } else {
+                    $common_elements = array();
+                    $intersect_elements = array_intersect($arrayzedPath1, $arrayzedPath2);
+                    $c_size  = sizeof($intersect_elements);
+                    foreach ($intersect_elements as $key => $value) {
+                        array_push($common_elements, $value);
+                    }
+                    $single_common = $common_elements[0];
+                    $index_of_com_on_p1 = array_search($single_common, $temp_p1);
+                    $index_of_com_on_p2 = array_search($single_common, $temp_p2);
+                    if ($index_of_com_on_p1 > $index_of_from) {
+                        $temp_p1 = array_slice($temp_p1, $index_of_from, ($index_of_com_on_p1 + 1));
+                    } else {
+                        $temp_p1 = array_slice($temp_p1, $index_of_com_on_p1, ($index_of_from - 1));
+                        $temp_p1 = array_reverse($temp_p1);
+                    }
+                    if ($index_of_com_on_p2 < $index_of_to) {
+                        $temp_p2 = array_slice($temp_p2, $index_of_to, ($index_of_com_on_p2 + 1));
+                    } else {
+                        $temp_p2 = array_slice($temp_p2, $index_of_to, ($index_of_com_on_p2  + 1));
+                        $temp_p2 = array_reverse($temp_p2);
+                    }
+                    $main_array = (array_unique(array_merge($temp_p1, $temp_p2)));
+                    return $main_array;
+                }
+            }
+        }
+    }
+
+    public function read_routeByFnT($from, $to)
+    {
+        $path_array = array();
+        $path_array = $this->getPathDirectly($from, $to);
+        if ($path_array == null) {
+
+            $path_array = $this->getPathIndirectly($from, $to);
+
+            if ($path_array == null) {
+
+                $path_array = $this->getPathAdvanceSearch($from, $to);
+                if ($path_array == null) {
+                    $response = array(
+                        "code" => "400",
+                        "message" => "Cannot Determine Path"
+                    );
+                } else {
+                    $path_array = array_values($path_array);
+                    $array_id = $this->getArrayOfIdFromPathPhone($path_array);
+                    $this->getCoordinatesFromArrayOfId($array_id);
+                }
+            } else {
+                $array_id = $this->getArrayOfIdFromPathPhone($path_array);
+                $this->getCoordinatesFromArrayOfId($array_id);
+            }
+        } else {
+            $array_id = $this->getArrayOfIdFromPathPhone($path_array);
+            $this->getCoordinatesFromArrayOfId($array_id);
+        }
+    }
+
+
+    function getArrayOfIdFromPathPhone($path)
+    {
+        $arrayOfID = array();
+        $nodes = null;
+        $size = 0;
+        //explode
+        $size = sizeof($path);
+        $nodes = array_values(array_unique($path));
+
+        for ($i = 0; $i < $size; $i++) {
+            $query =  "SELECT id FROM nodes WHERE name LIKE :id";
+            $stmt = $this->conn->prepare($query);
+            $nodes[$i] = '%' . $nodes[$i] . '%';
+            $stmt->bindParam(':id', $nodes[$i]);
+            if ($stmt->execute()) {
+                $result = $stmt;
+                $row = $result->fetch(PDO::FETCH_ASSOC);
+                // extract($row);
+                array_push($arrayOfID, $row['id']);
+            } else {
+            }
+        }
+        return $arrayOfID;
+    }
+}
