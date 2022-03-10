@@ -214,4 +214,42 @@ class RouteContribution
         }
         echo json_encode($response);
     }
+
+    function acknowledgeContribution($id)
+    {
+        $query = "UPDATE contribute_routes SET state_id = 2 where id =:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+    }
+
+    function acceptContribution($id, $route_id)
+    {
+        $query = "UPDATE contribute_routes SET state_id = 1 where id =:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        $query = "SELECT path from contribute_routes WHERE 
+        id =:id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $sug_path = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        echo $route_id;
+        $query = "UPDATE routes SET 
+        path = :path 
+        WHERE id = :id ";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $route_id);
+        $stmt->bindParam(':path', $sug_path['path']);
+        if ($stmt->execute()) {
+            $response = array(
+                "code" => 200,
+                "message" => "Contribution Accepted."
+            );
+        }
+        echo json_encode($response);
+    }
 }
