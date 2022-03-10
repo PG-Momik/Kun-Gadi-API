@@ -142,3 +142,76 @@ class RouteContribution
         }
         echo json_encode($response);
     }
+
+    function delete_Contribution($id)
+    {
+        $query = 'DELETE  FROM ' . $this->table . ' WHERE id = :id';
+        $stmt = $this->conn->prepare($query);
+        $this->id = htmlspecialchars(strip_tags($id));
+        $stmt->bindParam(':id', $this->id);
+        if ($stmt->execute()) {
+            $response = array(
+                "code" => 200,
+                "message" => "Contribution deleted."
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "Contribution not deleted."
+            );
+        }
+        echo json_encode($response);
+    }
+
+    function checkState($id)
+    {
+        $query = "SELECT state_id FROM " . $this->table . " WHERE  id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $state = $row['state_id'];
+        return $state;
+    }
+
+    function read_XContributions($page)
+    {
+        $limit = 10;
+        $start = ($page - 1) * $limit;
+        $query = "SELECT cr.id, 
+        cr.user_id, 
+        cr.state_id,
+        r.id as route_id,
+        r.start as sid,
+        r.end as eid,
+        r.path as o_path,
+        cr.path as n_path, 
+        cr.created,
+        u.name as user,
+        m.name as start,
+        n.name as end
+        FROM contribute_routes cr
+        JOIN routes r on cr.route_id = r.id
+        JOIN users u on cr.user_id = u.id
+        JOIN nodes m on r.start = m.id
+        JOIN nodes n on r.end = n.id
+        ORDER BY cr.created DESC LIMIT " . $start . ", " . $limit;
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
+}
