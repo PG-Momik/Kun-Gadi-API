@@ -51,3 +51,94 @@ class RouteContribution
         }
         echo json_encode($response);
     }
+
+    function read_AllContributions()
+    {
+        $query = "SELECT * FROM " . $this->table;
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
+
+    //works
+    function read_SingleContribution($id)
+    {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = " . $id;
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
+
+    //works
+    function read_UserContribution($id)
+    {
+        $query = "SELECT c.created, n.name as start, m.name as end, r.path as o_path, c.path as n_path, c.state_id FROM contribute_routes c JOIN routes r on c.route_id = r.id JOIN nodes n on n.id = r.start JOIN nodes m on m.id = r.end";
+
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
+
+    function read_RouteContribution($route_id)
+    {
+        $query = "SELECT * FROM " . $this->table . " WHERE route_id = " . $route_id;
+        $stmt = $this->conn->prepare($query);
+        $contributions_array = array();
+        if ($stmt->execute()) {
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                array_push($contributions_array, $row);
+            }
+            $response = array(
+                "code" => 200,
+                "message" => $contributions_array
+            );
+        } else {
+            $response = array(
+                "code" => 400,
+                "message" => "No data."
+            );
+        }
+        echo json_encode($response);
+    }
