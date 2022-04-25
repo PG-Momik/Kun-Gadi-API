@@ -2,7 +2,7 @@
 - By <a href="https://www.github.com/PG-Momik">Momik Shrestha
 
 # Structure
-<img src="https://www.github.com/PG-Momik/blob/main/API_architecture.png" width="450px" height="600px">
+<img src="https://www.github.com/PG-Momik/API_architecture.png" width="450px" height="600px">
 
 # How to access data?
 - Send JSON object to url and receive JSON data.
