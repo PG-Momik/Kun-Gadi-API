@@ -359,7 +359,7 @@ switch ($en) {
                 $r_contribution->route_id = htmlspecialchars(strip_tags($data->route_id));
                 $r_contribution->acceptContribution($r_contribution->id, $r_contribution->route_id);
                 break;
-            case "deleteContributiodn":
+            case "deleteContribution":
                 $data  = json_decode(file_get_contents("php://input"));
                 $r_contribution->id = htmlspecialchars(strip_tags($data->id));
                 $r_contribution->delete_Contribution($r_contribution->id);
