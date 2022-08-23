@@ -1,0 +1,28 @@
+# KUN-GADI API - v2
+- By <a href="github.com/PG-Momik">Momik Shrestha</a>
+# Changes:
+- Better OOP 
+- Classes are more coupled
+- Less bloat
+- Faster response time
+- Better request handling
+- Fixed endpoints/endpoints: 
+  - Routes:create
+  - Routes:update
+  - Routes:review
+  - Routes:approve
+  - ContributeRoute:update
+  - ContributeROute:review
+  - ContributeRoute:approve
+- Depricatede methods/endpoints
+  - User:getXUser
+  - User:getIdFromPhone
+  - Node:getXNode
+  - Route:getXRoute
+  - Route:getByEnd
+  - Route:getPathCoords
+  - Route:getPathCoordinates
+  - ContributeNode:readXContributions
+  - ContributeNode:readContributionByNode
+  - ContributeRoute:read_XContributions
+  - ContributeRoute:readSingleContribution
